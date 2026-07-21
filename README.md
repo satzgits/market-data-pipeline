@@ -1,5 +1,8 @@
 # Market Data Pipeline
 
+![License](https://img.shields.io/badge/License-MIT-yellow)
+![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
+
 Real-time market data ingestion, technical analysis, and condition-based alerting system.
 
 ## Overview
