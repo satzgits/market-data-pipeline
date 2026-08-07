@@ -68,9 +68,30 @@ def test_compute_all():
     print("  ✓ All indicators computed")
 
 
+def test_obv():
+    df = make_sample_data(200)
+    ti = TechnicalIndicators()
+    result = ti.obv(df)
+    assert "obv" in result.columns
+    assert (result["obv"].diff().dropna().abs() == df["volume"].iloc[1:]).all()
+    print("  ✓ OBV computed from volume direction")
+
+
+def test_mfi():
+    df = make_sample_data(200)
+    ti = TechnicalIndicators()
+    result = ti.mfi(df)
+    assert "mfi" in result.columns
+    mfi_vals = result["mfi"].dropna()
+    assert (mfi_vals >= 0).all() and (mfi_vals <= 100).all()
+    print("  ✓ MFI bounded between 0 and 100")
+
+
 if __name__ == "__main__":
     test_rsi()
     test_macd()
     test_bollinger_bands()
     test_compute_all()
+    test_obv()
+    test_mfi()
     print("\nAll pipeline tests passed!")

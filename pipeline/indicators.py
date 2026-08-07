@@ -71,3 +71,24 @@ class TechnicalIndicators:
         ], axis=1).max(axis=1)
         df["atr"] = tr.rolling(window=period).mean()
         return df
+
+    @staticmethod
+    def obv(df):
+        direction = np.sign(df["close"].diff())
+        direction.iloc[0] = 0
+        df["obv"] = (direction * df["volume"]).cumsum()
+        return df
+
+    @staticmethod
+    def mfi(df, period=14):
+        typical = (df["high"] + df["low"] + df["close"]) / 3
+        money_flow = typical * df["volume"]
+        diff = typical.diff()
+        pos = money_flow.where(diff > 0, 0.0)
+        neg = money_flow.where(diff <= 0, 0.0)
+        pos_sum = pos.rolling(window=period).sum()
+        neg_sum = neg.rolling(window=period).sum()
+        mfi_ratio = pos_sum / neg_sum.replace(0, np.nan)
+        df["mfi"] = 100 - (100 / (1 + mfi_ratio))
+        df["mfi"] = df["mfi"].fillna(50)
+        return df
