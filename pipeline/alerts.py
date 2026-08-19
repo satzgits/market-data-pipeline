@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+import pandas as pd
 
 
 class AlertEngine:
@@ -49,6 +50,12 @@ class AlertEngine:
             elif row["close"] >= row["bb_upper"] * 0.995:
                 alerts.append(("BB_UPPER_TOUCH", f"[{symbol}] Price at upper Bollinger Band — ${row['close']:.2f}"))
 
+        if not pd.isna(row.get("mfi")):
+            if row["mfi"] < self.thresholds["rsi_oversold"]:
+                alerts.append(("MFI_OVERSOLD", f"[{symbol}] MFI oversold - MFI = {row['mfi']:.1f}"))
+            elif row["mfi"] > self.thresholds["rsi_overbought"]:
+                alerts.append(("MFI_OVERBOUGHT", f"[{symbol}] MFI overbought - MFI = {row['mfi']:.1f}"))
+
         for alert_type, msg in alerts:
             self.logger.warning(msg)
             self.alerts.append({
@@ -59,3 +66,6 @@ class AlertEngine:
             })
 
         return alerts
+
+    def recent(self, limit=10):
+        return self.alerts[-limit:]
