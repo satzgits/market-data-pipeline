@@ -7,9 +7,18 @@ from pipeline.ingestion import DataIngestion
 from pipeline.indicators import TechnicalIndicators
 from pipeline.alerts import AlertEngine
 from pipeline.dashboard import Dashboard
+from pipeline.config_validation import validate_all
+
+
+def validate_pipeline_config():
+    """Validate the pipeline config at startup and fail fast if it is wrong."""
+    errors = validate_all(INDICATOR_CONFIG, ALERT_THRESHOLDS)
+    if errors:
+        raise ValueError("Invalid pipeline configuration:\n  - " + "\n  - ".join(errors))
 
 
 def run_live(symbols=None, interval=None):
+    validate_pipeline_config()
     symbols = symbols or SYMBOLS
     interval = interval or INTERVAL
 
@@ -41,6 +50,7 @@ def run_live(symbols=None, interval=None):
 
 
 def run_historical(symbol, interval="1h", limit=500):
+    validate_pipeline_config()
     ingestion = DataIngestion()
     indicators = TechnicalIndicators(INDICATOR_CONFIG)
     alerts = AlertEngine(ALERT_THRESHOLDS)
