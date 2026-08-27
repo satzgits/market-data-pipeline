@@ -1,6 +1,7 @@
 import os
 import time
 from datetime import datetime
+import pandas as pd
 
 
 class Dashboard:
@@ -16,6 +17,27 @@ class Dashboard:
         self.recent_alerts.append(alert)
         if len(self.recent_alerts) > 10:
             self.recent_alerts.pop(0)
+
+    def summary(self):
+        """Return a compact dict of the current dashboard state.
+
+        Useful for tests and for exposing a lightweight API/dashboard payload
+        without triggering the terminal rendering side-effects.
+        """
+        per_symbol = {}
+        for symbol, row in self.latest_bars.items():
+            per_symbol[symbol] = {
+                "close": row.get("close"),
+                "rsi": row.get("rsi"),
+                "macd_line": row.get("macd_line"),
+                "bb_upper": row.get("bb_upper"),
+                "bb_lower": row.get("bb_lower"),
+            }
+        return {
+            "symbols": list(self.latest_bars.keys()),
+            "latest_bars": per_symbol,
+            "recent_alerts": list(self.recent_alerts),
+        }
 
     def render(self):
         os.system("cls" if os.name == "nt" else "clear")
