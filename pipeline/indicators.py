@@ -18,6 +18,7 @@ class TechnicalIndicators:
             df = self.sma(df, period=p)
         for p in self.config.get("ema_periods", [12, 26]):
             df = self.ema(df, period=p)
+        df = self.roc(df, period=self.config.get("roc_period", 12))
         return df
 
     @staticmethod
@@ -91,4 +92,14 @@ class TechnicalIndicators:
         mfi_ratio = pos_sum / neg_sum.replace(0, np.nan)
         df["mfi"] = 100 - (100 / (1 + mfi_ratio))
         df["mfi"] = df["mfi"].fillna(50)
+        return df
+
+    @staticmethod
+    def roc(df, period=12):
+        """Rate of Change: percentage change of close over 'period' bars.
+
+        ROC = (close / close.shift(period) - 1) * 100. A momentum indicator used
+        to gauge the strength and direction of price movement.
+        """
+        df["roc"] = (df["close"] / df["close"].shift(period) - 1) * 100
         return df

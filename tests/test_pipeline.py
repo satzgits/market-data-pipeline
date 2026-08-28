@@ -84,7 +84,17 @@ def test_mfi():
     assert "mfi" in result.columns
     mfi_vals = result["mfi"].dropna()
     assert (mfi_vals >= 0).all() and (mfi_vals <= 100).all()
-    print("  ✓ MFI bounded between 0 and 100")
+    print("  � MFI bounded between 0 and 100")
+
+
+def test_roc():
+    df = make_sample_data(200)
+    ti = TechnicalIndicators()
+    result = ti.roc(df)
+    assert "roc" in result.columns
+    roc_vals = result["roc"].dropna()
+    assert (roc_vals > -50).all() and (roc_vals < 50).all() or len(roc_vals) == 0
+    print("  � ROC computed")
 
 
 if __name__ == "__main__":
@@ -94,4 +104,5 @@ if __name__ == "__main__":
     test_compute_all()
     test_obv()
     test_mfi()
+    test_roc()
     print("\nAll pipeline tests passed!")
